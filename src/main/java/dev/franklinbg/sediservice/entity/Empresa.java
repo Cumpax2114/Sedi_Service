@@ -1,5 +1,7 @@
 package dev.franklinbg.sediservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -21,6 +23,7 @@ public class Empresa {
     private String telefono;
     @Column(nullable = false, length = 100)
     private String correo;
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     @Column(nullable = false)
     private Date fecha_alta;
     @Column(nullable = false, length = 1)
