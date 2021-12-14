@@ -20,7 +20,7 @@ public class UsuarioService {
     }
 
     public GenericResponse<Usuario> login(String email, String password) {
-        Optional<Usuario> optUsuario = repository.findByUserNameAndPassword(email, password);
+        Optional<Usuario> optUsuario = repository.findByCorreoAndContrasenia(email, password);
         if (optUsuario.isPresent()) {
             Usuario usuario = optUsuario.get();
             return new GenericResponse<>(TIPO_AUTH, RPTA_OK, "Bienvenido al sistema:" + usuario.getNombre(), usuario);
