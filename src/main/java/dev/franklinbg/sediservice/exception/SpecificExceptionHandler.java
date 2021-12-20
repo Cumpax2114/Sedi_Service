@@ -14,11 +14,11 @@ import static dev.franklinbg.sediservice.utils.Global.RPTA_ERROR;
 public class SpecificExceptionHandler {
     @ExceptionHandler(JDBCException.class)
     public GenericResponse sqlException(JDBCException ex){
-        return new GenericResponse("sql-exception", -1,ex.getMessage(),null);
+        return new GenericResponse<>("sql-exception", -1,ex.getMessage(),null);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public GenericResponse validException(MethodArgumentNotValidException ex){
-        return new GenericResponse("valid-exception", RPTA_ERROR, ex.getMessage(),null);
+        return new GenericResponse<>("valid-exception", RPTA_ERROR, ex.getMessage());
     }
 
 }

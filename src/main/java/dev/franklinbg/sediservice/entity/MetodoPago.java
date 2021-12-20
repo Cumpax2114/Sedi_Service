@@ -8,8 +8,6 @@ public class MetodoPago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(length = 11)
     private int id;
-    @Column(length = 11, nullable = false)
-    private int TipoPago;
     @Column(length = 90, nullable = false)
     private String nombre;
     @Column(length = 100, nullable = false)
@@ -27,14 +25,6 @@ public class MetodoPago {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getTipoPago() {
-        return TipoPago;
-    }
-
-    public void setTipoPago(int tipoPago) {
-        TipoPago = tipoPago;
     }
 
     public String getNombre() {

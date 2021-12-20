@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GenericExceptionHandler {
     @ExceptionHandler(Exception.class)
     public GenericResponse genericException(Exception ex) {
-        return new GenericResponse("exception", -1, ex.getMessage(), null);
+        return new GenericResponse<>("exception", -1, ex.getMessage());
     }
 }

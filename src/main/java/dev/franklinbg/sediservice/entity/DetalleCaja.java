@@ -14,7 +14,8 @@ public class DetalleCaja {
     private MetodoPago metodoPago;
     @Column(columnDefinition = "DECIMAL(11,2)", nullable = false)
     private double monto;
-
+    @Column(columnDefinition = "DECIMAL(11,2)", nullable = false)
+    private double montoCierre;
     public int getId() {
         return id;
     }
@@ -45,5 +46,13 @@ public class DetalleCaja {
 
     public void setMonto(double monto) {
         this.monto = monto;
+    }
+
+    public double getMontoCierre() {
+        return montoCierre;
+    }
+
+    public void setMontoCierre(double montoCierre) {
+        this.montoCierre = montoCierre;
     }
 }

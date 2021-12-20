@@ -23,7 +23,7 @@ public class Empresa {
     private String telefono;
     @Column(nullable = false, length = 100)
     private String correo;
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss",timezone = "America/Lima")
     @Column(nullable = false)
     private Date fecha_alta;
     @Column(nullable = false, length = 1)

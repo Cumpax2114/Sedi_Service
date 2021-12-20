@@ -1,7 +1,7 @@
 package dev.franklinbg.sediservice.service;
 
 import dev.franklinbg.sediservice.entity.Usuario;
-import dev.franklinbg.sediservice.repsoitory.UsuarioRepository;
+import dev.franklinbg.sediservice.repository.UsuarioRepository;
 import dev.franklinbg.sediservice.utils.GenericResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ public class UsuarioService {
             Usuario usuario = optUsuario.get();
             return new GenericResponse<>(TIPO_AUTH, RPTA_OK, "Bienvenido al sistema:" + usuario.getNombre(), usuario);
         } else {
-            return new GenericResponse<>(TIPO_AUTH, RPTA_WARNING, "No se encontró al usuario", null);
+            return new GenericResponse<>(TIPO_AUTH, RPTA_WARNING, "No se encontró al usuario");
         }
     }
 }

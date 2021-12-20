@@ -16,6 +16,13 @@ public class GenericResponse<T> {
         this.body = body;
     }
 
+    public GenericResponse(String type, int rpta, String message) {
+        this.type = type;
+        this.rpta = rpta;
+        this.message = message;
+        this.body = null;
+    }
+
     public String getType() {
         return type;
     }

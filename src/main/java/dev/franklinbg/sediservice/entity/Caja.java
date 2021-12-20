@@ -1,5 +1,7 @@
 package dev.franklinbg.sediservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -10,8 +12,10 @@ public class Caja {
     @Column(length = 11)
     private int id;
     @Column(nullable = false)
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "America/Lima")
     private Date fechaApertura;
     @Column(nullable = false)
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "America/Lima")
     private Date fechaCierre;
     @Column(columnDefinition = "DECIMAL(11,2)")
     private double montoApertura;
