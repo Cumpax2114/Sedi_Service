@@ -8,7 +8,7 @@ public class ConceptoMovCaja {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(length = 11)
     private int id;
-    @Column(length = 11, nullable = false)
+    @Column(length = 30, nullable = false)
     private String nombre;
     @Column(length = 1, nullable = false)
     private char estado;

@@ -14,8 +14,6 @@ public class MetodoPago {
     private String numeroCuenta;
     @Column(length = 100, nullable = false)
     private String cci;
-    @Column(columnDefinition = "DECIMAL(11,2)", nullable = false)
-    private double monto;
     @Column(length = 1, nullable = false)
     private char estado;
 
@@ -49,14 +47,6 @@ public class MetodoPago {
 
     public void setCci(String cci) {
         this.cci = cci;
-    }
-
-    public double getMonto() {
-        return monto;
-    }
-
-    public void setMonto(double monto) {
-        this.monto = monto;
     }
 
     public char getEstado() {

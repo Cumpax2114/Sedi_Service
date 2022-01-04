@@ -1,6 +1,9 @@
 package dev.franklinbg.sediservice.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class MovCaja {
@@ -8,22 +11,29 @@ public class MovCaja {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(length = 11)
     private int id;
+    @NotNull
     @ManyToOne(optional = false)
     private Caja caja;
+    @NotNull
     @ManyToOne(optional = false)
     private Usuario usuario;
     @Column(length = 1, nullable = false)
     private char tipoMov;
+    @NotNull
     @ManyToOne(optional = false)
     private ConceptoMovCaja conceptoMovCaja;
+    @NotNull
     @ManyToOne(optional = false)
     private MetodoPago metodoPago;
-    @Column(length = 11, nullable = false)
-    private int idTrabajador;
-    @Column(length = 11)
-    private String nombre;
+    @ManyToOne
+    private Usuario trabajador;
+    @ManyToOne
+    private Cliente cliente;
+    @ManyToOne
+    private Proveedor proveedor;
     @Column(columnDefinition = "DECIMAL(11,2)", nullable = false)
     private double total;
+    @NotBlank
     @Column(length = 250, nullable = false)
     private String descripcion;
     @Column(length = 1, nullable = false)
@@ -77,20 +87,28 @@ public class MovCaja {
         this.metodoPago = metodoPago;
     }
 
-    public int getIdTrabajador() {
-        return idTrabajador;
+    public Usuario getTrabajador() {
+        return trabajador;
     }
 
-    public void setIdTrabajador(int idTrabajador) {
-        this.idTrabajador = idTrabajador;
+    public void setTrabajador(Usuario trabajador) {
+        this.trabajador = trabajador;
     }
 
-    public String getNombre() {
-        return nombre;
+    public Cliente getCliente() {
+        return cliente;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Proveedor getProveedor() {
+        return proveedor;
+    }
+
+    public void setProveedor(Proveedor proveedor) {
+        this.proveedor = proveedor;
     }
 
     public double getTotal() {
