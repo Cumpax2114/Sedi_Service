@@ -44,6 +44,7 @@ public class CajaService {
             }
             Caja caja = optCaja.get();
             caja.setMontoApertura(montoApertura);
+            caja.setMontoCierre(montoApertura);
             caja.setEstado('A');
             caja.setFechaApertura(new Date());
             repository.save(caja);
@@ -54,12 +55,19 @@ public class CajaService {
     }
 
     public GenericResponse<MovCaja> saveMovimiento(MovCaja movCaja) {
+        movCaja.setEstado('P');
         if (movCaja.getTipoMov() == 'E' || movCaja.getTipoMov() == 'S') {
             Optional<Caja> optionalCaja = repository.findById(movCaja.getCaja().getId());
             if (optionalCaja.isPresent()) {
                 Caja caja = optionalCaja.get();
-                caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
-                repository.save(caja);
+                if (movCaja.getTipoMov() == 'E') {
+                    caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
+                } else {
+                    if (movCaja.getTotal() > caja.getMontoCierre()) {
+                        return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en caja,disponible:" + caja.getMontoCierre());
+                    }
+                    caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
+                }
                 Optional<MetodoPago> optionalMetodoPago = metodoPagoRepsository.findById(movCaja.getMetodoPago().getId());
                 if (optionalMetodoPago.isPresent()) {
                     MetodoPago metodoPago = optionalMetodoPago.get();
@@ -71,10 +79,14 @@ public class CajaService {
                             if (movCaja.getTipoMov() == 'E') {
                                 detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + movCaja.getTotal());
                             } else {
+                                if (movCaja.getTotal() > detalleCaja.getMontoCierre()) {
+                                    return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en este metodo de pago,disponible:" + detalleCaja.getMontoCierre());
+                                }
                                 detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - movCaja.getTotal());
                             }
+                            repository.save(caja);
                             detalleCajaRepository.save(detalleCaja);
-                            return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "detalle registrado correctamente", movCajaRepository.save(movCaja));
+                            return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "movimiento registrado correctamente", movCajaRepository.save(movCaja));
                         } else {
                             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "detalle de caja no encontrado");
                         }
@@ -89,6 +101,35 @@ public class CajaService {
             }
         } else {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "tipo de movimiento no válido");
+        }
+    }
+
+    public GenericResponse<MovCaja> anularMovimiento(int id) {
+        Optional<MovCaja> optionalMovCaja = movCajaRepository.findById(id);
+        if (optionalMovCaja.isPresent()) {
+            MovCaja movCaja = optionalMovCaja.get();
+            if (movCaja.getEstado() == 'A') {
+                return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "el movimiento que desea anular ya está anulado");
+            }
+            movCaja.setEstado('A');
+            Caja caja = movCaja.getCaja();
+            Optional<DetalleCaja> optionalDetalleCaja = detalleCajaRepository.findByCajaIdAndMetodoPagoIdAndCerradoIsFalse(movCaja.getCaja().getId(), movCaja.getMetodoPago().getId());
+            if (optionalDetalleCaja.isPresent()) {
+                DetalleCaja detalleCaja = optionalDetalleCaja.get();
+                if (movCaja.getTipoMov() == 'E') {
+                    detalleCaja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
+                    caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
+                } else {
+                    caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
+                    detalleCaja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
+                }
+                repository.save(caja);
+                return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "movimiento anulado correctamente", movCajaRepository.save(movCaja));
+            } else {
+                return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se encontró el detalle de caja a actualizar");
+            }
+        } else {
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se encontró el movimiento a anular");
         }
     }
 }

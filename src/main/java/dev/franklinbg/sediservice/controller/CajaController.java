@@ -32,4 +32,9 @@ public class CajaController {
     public GenericResponse<MovCaja> saveMovimiento(@Valid @RequestBody MovCaja movCaja) {
         return service.saveMovimiento(movCaja);
     }
+
+    @DeleteMapping("movimiento/{id}")
+    public GenericResponse<MovCaja> anularMovimiento(@PathVariable int id) {
+        return service.anularMovimiento(id);
+    }
 }

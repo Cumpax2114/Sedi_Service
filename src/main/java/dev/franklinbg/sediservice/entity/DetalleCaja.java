@@ -16,6 +16,9 @@ public class DetalleCaja {
     private double monto;
     @Column(columnDefinition = "DECIMAL(11,2)", nullable = false)
     private double montoCierre;
+    @Column(nullable = false)
+    private boolean cerrado;
+
     public int getId() {
         return id;
     }
@@ -54,5 +57,13 @@ public class DetalleCaja {
 
     public void setMontoCierre(double montoCierre) {
         this.montoCierre = montoCierre;
+    }
+
+    public boolean isCerrado() {
+        return cerrado;
+    }
+
+    public void setCerrado(boolean cerrado) {
+        this.cerrado = cerrado;
     }
 }

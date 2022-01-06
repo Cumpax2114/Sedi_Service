@@ -3,9 +3,10 @@ package dev.franklinbg.sediservice.service;
 import dev.franklinbg.sediservice.entity.Cliente;
 import dev.franklinbg.sediservice.repository.ClienteRepository;
 import dev.franklinbg.sediservice.utils.GenericResponse;
-import dev.franklinbg.sediservice.utils.Global;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static dev.franklinbg.sediservice.utils.Global.*;
 
 @Service
 @Transactional
@@ -18,9 +19,13 @@ public class ClienteService {
 
     public GenericResponse<Cliente> save(Cliente cliente) {
         if (repository.existsByDocumento(cliente.getDocumento())) {
-            return new GenericResponse<>(Global.TIPO_RESULT, Global.RPTA_WARNING, "ya existe un cliente con el mismo documento");
+            return new GenericResponse<>(TIPO_RESULT,RPTA_WARNING, "ya existe un cliente con el mismo documento");
         } else {
-            return new GenericResponse<>(Global.TIPO_RESULT, Global.RPTA_OK, "cliente registrado correctamente", repository.save(cliente));
+            return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "cliente registrado correctamente", repository.save(cliente));
         }
+    }
+
+    public GenericResponse<Iterable<Cliente>> listAll() {
+        return new GenericResponse<>(TIPO_RESULT,RPTA_OK,OPERACION_CORRECTA, repository.findAll());
     }
 }
