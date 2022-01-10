@@ -28,4 +28,8 @@ public class UsuarioService {
             return new GenericResponse<>(TIPO_AUTH, RPTA_WARNING, "No se encontró al usuario");
         }
     }
+
+    public GenericResponse<Iterable<Usuario>> listAll() {
+        return new GenericResponse<>(TIPO_AUTH, RPTA_OK, OPERACION_CORRECTA, repository.findAll());
+    }
 }

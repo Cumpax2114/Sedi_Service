@@ -14,6 +14,11 @@ public class UsuarioController {
         this.service = service;
     }
 
+    @GetMapping
+    public GenericResponse<Iterable<Usuario>> listAll() {
+        return service.listAll();
+    }
+
     @PostMapping("login")
     public GenericResponse<Usuario> login(@RequestParam String email, @RequestParam String password) {
         return service.login(email, password);
