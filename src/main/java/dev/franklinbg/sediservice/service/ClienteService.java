@@ -19,13 +19,13 @@ public class ClienteService {
 
     public GenericResponse<Cliente> save(Cliente cliente) {
         if (repository.existsByDocumento(cliente.getDocumento())) {
-            return new GenericResponse<>(TIPO_RESULT,RPTA_WARNING, "ya existe un cliente con el mismo documento");
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "ya existe un cliente con el mismo documento");
         } else {
             return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "cliente registrado correctamente", repository.save(cliente));
         }
     }
 
     public GenericResponse<Iterable<Cliente>> listAll() {
-        return new GenericResponse<>(TIPO_RESULT,RPTA_OK,OPERACION_CORRECTA, repository.findAll());
+        return new GenericResponse<>(TIPO_RESULT, RPTA_OK, OPERACION_CORRECTA, repository.findAll());
     }
 }

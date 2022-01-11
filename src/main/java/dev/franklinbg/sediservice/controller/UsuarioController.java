@@ -19,6 +19,11 @@ public class UsuarioController {
         return service.listAll();
     }
 
+    @GetMapping("fmc/{id}")
+    public GenericResponse<Iterable<Usuario>> listForMovCaja(@PathVariable int id) {
+        return service.listForMovCaja(id);
+    }
+
     @PostMapping("login")
     public GenericResponse<Usuario> login(@RequestParam String email, @RequestParam String password) {
         return service.login(email, password);

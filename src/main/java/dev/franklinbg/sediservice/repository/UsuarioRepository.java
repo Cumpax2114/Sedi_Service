@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends CrudRepository<Usuario, Integer> {
     Optional<Usuario> findByCorreoAndContrasenia(String correo, String contrasenia);
+
+    Iterable<Usuario> findAllByIdIsNot(int id);
 }

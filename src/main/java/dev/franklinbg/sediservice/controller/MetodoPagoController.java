@@ -16,7 +16,7 @@ public class MetodoPagoController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/activos")
     public GenericResponse<Iterable<MetodoPago>> getAll() {
         return service.getAll();
     }

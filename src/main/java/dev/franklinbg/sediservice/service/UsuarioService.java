@@ -32,4 +32,12 @@ public class UsuarioService {
     public GenericResponse<Iterable<Usuario>> listAll() {
         return new GenericResponse<>(TIPO_AUTH, RPTA_OK, OPERACION_CORRECTA, repository.findAll());
     }
+
+    public GenericResponse<Iterable<Usuario>> listForMovCaja(int id) {
+        if (repository.existsById(id)) {
+            return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, repository.findAllByIdIsNot(id));
+        } else {
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "usuario no encontrado");
+        }
+    }
 }
