@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-01-2022 a las 00:36:00
+-- Tiempo de generación: 18-01-2022 a las 04:31:54
 -- Versión del servidor: 10.4.21-MariaDB
 -- Versión de PHP: 8.0.10
 
@@ -42,7 +42,7 @@ CREATE TABLE `caja` (
 --
 
 INSERT INTO `caja` (`id`, `estado`, `fecha_apertura`, `fecha_cierre`, `monto_apertura`, `monto_cierre`, `usuario_id`) VALUES
-(1, 'A', '2022-01-03 19:01:38', '2021-12-17 11:04:54', '1500.00', '1000.00', 1);
+(1, 'A', '2022-01-13 20:08:08', '2021-12-17 11:04:54', '160.00', '250.00', 1);
 
 -- --------------------------------------------------------
 
@@ -71,7 +71,8 @@ INSERT INTO `cliente` (`id`, `correo`, `direccion`, `documento`, `estado`, `mont
 (3, NULL, 'AV. CANAVAL Y MOREYRA NRO. 590 URB. EL PALOMAR, LIMA - LIMA - SAN ISIDRO', '20391166855', 'I', '0.00', 'EPSON PERU S.A', '01-2985183', '15,1501,150131'),
 (4, NULL, 'CALLE VENUS 145 URB.SANTA ELENA', '16620936', 'A', '0.00', 'CUMPA SANCHEZ, OSCAR MANUEL', '956322572', '14,1401,140101'),
 (5, NULL, 'CALLE VENUS 145 URB SANTA ELENA', '01139746', 'I', '0.00', 'VEINTIMILLA TUESTA, JESUS', '993660243', '14,1401,140101'),
-(6, NULL, 'exapledirbyJmontanaro', '835681026719243', 'A', '0.00', 'Jonas Montanaro de Farina', '+571672578192', '. . .');
+(6, NULL, 'exapledirbyJmontanaro', '835681026719243', 'A', '0.00', 'Jonas Montanaro de Farina', '+571672578192', '. . .'),
+(7, NULL, 'RAMA CUSTODIO MZ F LT 65 CPM CALLANCA', '71509556', 'A', '0.00', 'BUENO GONZALES, FRANKLIN', '985178542', '14,1401,140108');
 
 -- --------------------------------------------------------
 
@@ -133,9 +134,9 @@ CREATE TABLE `detalle_caja` (
 --
 
 INSERT INTO `detalle_caja` (`id`, `monto`, `caja_id`, `metodo_pago_id`, `monto_cierre`, `cerrado`) VALUES
-(1, '250.00', 1, 1, '0.00', b'0'),
-(2, '500.00', 1, 2, '250.00', b'0'),
-(3, '750.00', 1, 3, '750.00', b'0');
+(1, '10.00', 1, 1, '40.00', b'0'),
+(2, '50.00', 1, 2, '50.00', b'0'),
+(3, '100.00', 1, 3, '0.00', b'0');
 
 -- --------------------------------------------------------
 
@@ -160,7 +161,8 @@ CREATE TABLE `empresa` (
 --
 
 INSERT INTO `empresa` (`id`, `correo`, `direccion`, `estado`, `fecha_alta`, `razon_social`, `ruc`, `telefono`, `ubigeo`) VALUES
-(1, 'empresa1@gmail.com', 'direccionejemplo', 'A', '2021-12-09 15:27:49', 'Empresa 1', '83561293471', '970778767', '---');
+(1, 'empresa1@gmail.com', 'direccionejemplo', 'A', '2021-12-09 15:27:49', 'Empresa 1', '83561293471', '970778767', '---'),
+(2, 'empresa2@gmail.com', 'direccionejemplo', 'A', '2022-01-17 16:06:16', 'Empresa 2', '64926661018', '981682241', '---');
 
 -- --------------------------------------------------------
 
@@ -211,9 +213,8 @@ CREATE TABLE `mov_caja` (
 --
 
 INSERT INTO `mov_caja` (`id`, `descripcion`, `estado`, `tipo_mov`, `total`, `caja_id`, `concepto_mov_caja_id`, `metodo_pago_id`, `usuario_id`, `cliente_id`, `proveedor_id`, `trabajador_id`) VALUES
-(6, 'salida de efectivo', 'P', 'S', '50.00', 1, 18, 1, 1, 1, NULL, NULL),
-(7, 'salida de efectivo', 'P', 'S', '200.00', 1, 18, 1, 1, 1, NULL, NULL),
-(8, 'salida BCP', 'P', 'S', '250.00', 1, 18, 2, 1, 1, NULL, NULL);
+(1, 'primer movimiento de caja registrado desde el aplicativo móvil', 'P', 'E', '40.00', 1, 17, 1, 1, 1, NULL, NULL),
+(2, 'segundo movimiento de caja registrado desde el aplicativo móvil', 'P', 'E', '50.00', 1, 19, 2, 1, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -250,6 +251,13 @@ CREATE TABLE `proveedor` (
   `ubigeo` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `proveedor`
+--
+
+INSERT INTO `proveedor` (`id`, `correo`, `direccion`, `documento`, `estado`, `monto_compra`, `nombre`, `telefono`, `ubigeo`) VALUES
+(1, 'proveddor1@outlook.com', 'dirrrr', '98156283713', 'A', '200.00', 'Proveedor 1', '963813005', '- - -');
+
 -- --------------------------------------------------------
 
 --
@@ -283,7 +291,8 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `contrasenia`, `correo`, `login`, `nombre`, `telefono`, `empresa_id`) VALUES
-(1, 'admin12345', 'oantoniocumpa@gmail.com', 'ocumpaV', 'Oscar Antonio', '937813800', 1);
+(1, 'admin123', 'frabugo@gmail.com', 'ocumpaV', 'Franklin Bueno Gonzales', '937813800', 1),
+(11, 'jhon9669', 'jhonpablo96@hotmail.com', 'jhonTM96', 'Jhon Timaná Gonzales', '946519928', 2);
 
 --
 -- Índices para tablas volcadas
@@ -395,7 +404,7 @@ ALTER TABLE `caja`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `concepto_mov_caja`
@@ -419,7 +428,7 @@ ALTER TABLE `detalle_caja`
 -- AUTO_INCREMENT de la tabla `empresa`
 --
 ALTER TABLE `empresa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `metodo_pago`
@@ -431,7 +440,7 @@ ALTER TABLE `metodo_pago`
 -- AUTO_INCREMENT de la tabla `mov_caja`
 --
 ALTER TABLE `mov_caja`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `pago_contrato`
@@ -443,7 +452,7 @@ ALTER TABLE `pago_contrato`
 -- AUTO_INCREMENT de la tabla `proveedor`
 --
 ALTER TABLE `proveedor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_contrato`
@@ -455,7 +464,7 @@ ALTER TABLE `tipo_contrato`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Restricciones para tablas volcadas
