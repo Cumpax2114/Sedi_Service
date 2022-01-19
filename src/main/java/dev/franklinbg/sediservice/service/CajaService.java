@@ -4,12 +4,22 @@ import dev.franklinbg.sediservice.entity.*;
 import dev.franklinbg.sediservice.entity.dto.CajaWithDetallesDTO;
 import dev.franklinbg.sediservice.repository.*;
 import dev.franklinbg.sediservice.utils.GenericResponse;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
 
 import static dev.franklinbg.sediservice.utils.Global.*;
 
-import java.util.Date;
+import java.io.File;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Service
@@ -20,13 +30,15 @@ public class CajaService {
     private final MetodoPagoRepsository metodoPagoRepsository;
     private final MovCajaRepository movCajaRepository;
     private final ConceptoMovCajaRepository conceptoMovCajaRepository;
+    private final AperturaRepository aperturaRepository;
 
-    public CajaService(CajaRepository repository, DetalleCajaRepository detalleCajaRepository, MetodoPagoRepsository metodoPagoRepsository, MovCajaRepository movCajaRepository, ConceptoMovCajaRepository conceptoMovCajaRepository) {
+    public CajaService(CajaRepository repository, DetalleCajaRepository detalleCajaRepository, MetodoPagoRepsository metodoPagoRepsository, MovCajaRepository movCajaRepository, ConceptoMovCajaRepository conceptoMovCajaRepository, AperturaRepository aperturaRepository) {
         this.repository = repository;
         this.detalleCajaRepository = detalleCajaRepository;
         this.metodoPagoRepsository = metodoPagoRepsository;
         this.movCajaRepository = movCajaRepository;
         this.conceptoMovCajaRepository = conceptoMovCajaRepository;
+        this.aperturaRepository = aperturaRepository;
     }
 
     public GenericResponse<Caja> findByUsuarioId(int idU) {
@@ -40,15 +52,35 @@ public class CajaService {
             detalleCajaRepository.saveAll(dto.getDetalles());
             double montoApertura = 0.0;
             for (DetalleCaja detalle : dto.getDetalles()) {
+                detalle.setFechaCreacion(new Date(new java.util.Date().getTime()));
                 montoApertura += detalle.getMonto();
             }
             Caja caja = optCaja.get();
             caja.setMontoApertura(montoApertura);
             caja.setMontoCierre(montoApertura);
             caja.setEstado('A');
-            caja.setFechaApertura(new Date());
+            caja.setFechaApertura(new java.util.Date());
+            Apertura apertura = new Apertura(caja, new Date(new java.util.Date().getTime()));
+            aperturaRepository.save(apertura);
             repository.save(caja);
             return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "caja abierta correctamente", dto);
+        } else {
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se encontro la caja");
+        }
+    }
+
+    public GenericResponse<Iterable<DetalleCaja>> close(int idCaja) {
+        Optional<Caja> optionalCaja = repository.findById(idCaja);
+        if (optionalCaja.isPresent()) {
+            Caja caja = optionalCaja.get();
+            caja.setFechaCierre(new java.util.Date());
+            Iterable<DetalleCaja> detallesCaja = detalleCajaRepository.findAllByCajaIdAndCerradoIsFalse(caja.getId());
+            for (DetalleCaja detalle : detallesCaja) {
+                detalle.setCerrado(true);
+            }
+            repository.save(caja);
+            detalleCajaRepository.saveAll(detallesCaja);
+            return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "caja cerrada correctamente", detallesCaja);
         } else {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se encontro la caja");
         }
@@ -86,6 +118,7 @@ public class CajaService {
                             }
                             repository.save(caja);
                             detalleCajaRepository.save(detalleCaja);
+                            movCaja.setApertura(aperturaRepository.getLastRegister());
                             return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "movimiento registrado correctamente", movCajaRepository.save(movCaja));
                         } else {
                             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "detalle de caja no encontrado");
@@ -130,6 +163,52 @@ public class CajaService {
             }
         } else {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se encontró el movimiento a anular");
+        }
+    }
+
+    public ResponseEntity<?> descargarReporte(int idCaja, String fechaApertura) {
+        try {
+            File xmlReport = ResourceUtils.getFile("classpath:reports/reporteMovCaja.jasper");
+            Optional<Caja> optCaja = repository.findById(idCaja);
+            if (optCaja.isPresent()) {
+                Caja caja = optCaja.get();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date dateFechaApertura = new Date(simpleDateFormat.parse(fechaApertura).getTime());
+                if (aperturaRepository.existsByCajaIdAndFechaApertura(caja.getId(), dateFechaApertura)) {
+                    Iterable<DetalleCaja> detalles = detalleCajaRepository.findAllByCajaIdAndFechaCreacion(idCaja, dateFechaApertura);
+                    JasperReport compiledReport = (JasperReport) JRLoader.loadObject(xmlReport);
+                    HashMap<String, Object> parameters = new HashMap<>();
+                    parameters.put("vendedor", caja.getUsuario().getNombre());
+                    parameters.put("estadoCaja", caja.getEstado() == 'A' ? "Abierta" : "Cerrada");
+                    parameters.put("saldoInicial", caja.getMontoApertura());
+                    parameters.put("saldoFinal", caja.getMontoCierre());
+                    parameters.put("ingreso", 0.00);
+                    parameters.put("egreso", 0.00);
+                    parameters.put("detallesDS", new JRBeanCollectionDataSource((Collection<?>) detalles));
+                    parameters.put("movimientosDS", new JRBeanCollectionDataSource((Collection<?>) movCajaRepository.findAllByCajaIdAndAperturaFechaApertura(caja.getId(), dateFechaApertura)));
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(compiledReport, parameters, new JREmptyDataSource());
+                    byte[] binaryReport = JasperExportManager.exportReportToPdf(jasperPrint);
+                    ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                            .filename("sediReport_" + new java.util.Date().getTime() + ".pdf")
+                            .build();
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentDisposition(contentDisposition);
+                    return ResponseEntity.ok().contentLength(binaryReport.length)
+                            .headers(headers)
+                            .contentType(MediaType.APPLICATION_PDF)
+                            .body(new ByteArrayResource(binaryReport));
+                } else {
+                    System.err.println("esta caja no tiene una apertura con la fecha especificada");
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            } else {
+                System.err.println("caja no encontrada");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

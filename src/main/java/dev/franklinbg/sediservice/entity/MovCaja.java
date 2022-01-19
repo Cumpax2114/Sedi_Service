@@ -2,7 +2,6 @@ package dev.franklinbg.sediservice.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -11,6 +10,8 @@ public class MovCaja {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(length = 11)
     private int id;
+    @ManyToOne
+    private Apertura apertura;
     @NotNull
     @ManyToOne(optional = false)
     private Caja caja;
@@ -45,6 +46,14 @@ public class MovCaja {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Apertura getApertura() {
+        return apertura;
+    }
+
+    public void setApertura(Apertura apertura) {
+        this.apertura = apertura;
     }
 
     public Caja getCaja() {
@@ -133,5 +142,13 @@ public class MovCaja {
 
     public void setEstado(char estado) {
         this.estado = estado;
+    }
+
+    public String getNombreCliente() {
+        return cliente.getNombre();
+    }
+
+    public String getNombreMetodoPago() {
+        return metodoPago.getNombre();
     }
 }

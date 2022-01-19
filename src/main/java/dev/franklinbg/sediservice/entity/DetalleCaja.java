@@ -1,6 +1,9 @@
 package dev.franklinbg.sediservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
+import java.sql.Date;
 
 @Entity
 public class DetalleCaja {
@@ -8,6 +11,9 @@ public class DetalleCaja {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(length = 11)
     private int id;
+    @Column(nullable = false)
+    @JsonFormat(pattern = "dd/MM/yyyy", timezone = "America/Lima")
+    private Date fechaCreacion;
     @ManyToOne(optional = false)
     private Caja caja;
     @ManyToOne(optional = false)
@@ -25,6 +31,14 @@ public class DetalleCaja {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 
     public Caja getCaja() {
@@ -65,5 +79,9 @@ public class DetalleCaja {
 
     public void setCerrado(boolean cerrado) {
         this.cerrado = cerrado;
+    }
+
+    public String getNombreMetodoPago() {
+        return metodoPago.getNombre();
     }
 }

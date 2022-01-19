@@ -1,10 +1,12 @@
 package dev.franklinbg.sediservice.controller;
 
 import dev.franklinbg.sediservice.entity.Caja;
+import dev.franklinbg.sediservice.entity.DetalleCaja;
 import dev.franklinbg.sediservice.entity.MovCaja;
 import dev.franklinbg.sediservice.entity.dto.CajaWithDetallesDTO;
 import dev.franklinbg.sediservice.service.CajaService;
 import dev.franklinbg.sediservice.utils.GenericResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,6 +30,11 @@ public class CajaController {
         return service.open(dto);
     }
 
+    @PostMapping("close")
+    public GenericResponse<Iterable<DetalleCaja>> close(@RequestParam int idCaja) {
+        return service.close(idCaja);
+    }
+
     @PostMapping("movimiento")
     public GenericResponse<MovCaja> saveMovimiento(@Valid @RequestBody MovCaja movCaja) {
         return service.saveMovimiento(movCaja);
@@ -36,5 +43,10 @@ public class CajaController {
     @DeleteMapping("movimiento/{id}")
     public GenericResponse<MovCaja> anularMovimiento(@PathVariable int id) {
         return service.anularMovimiento(id);
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<?> report(@RequestParam int idCaja, @RequestParam String fechaApertura) {
+        return service.descargarReporte(idCaja, fechaApertura);
     }
 }
