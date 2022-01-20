@@ -49,12 +49,13 @@ public class CajaService {
     public GenericResponse<CajaWithDetallesDTO> open(CajaWithDetallesDTO dto) {
         Optional<Caja> optCaja = repository.findById(dto.getIdCaja());
         if (optCaja.isPresent()) {
-            detalleCajaRepository.saveAll(dto.getDetalles());
             double montoApertura = 0.0;
             for (DetalleCaja detalle : dto.getDetalles()) {
                 detalle.setFechaCreacion(new Date(new java.util.Date().getTime()));
+                detalle.setMontoCierre(detalle.getMonto());
                 montoApertura += detalle.getMonto();
             }
+            detalleCajaRepository.saveAll(dto.getDetalles());
             Caja caja = optCaja.get();
             caja.setMontoApertura(montoApertura);
             caja.setMontoCierre(montoApertura);
@@ -73,14 +74,18 @@ public class CajaService {
         Optional<Caja> optionalCaja = repository.findById(idCaja);
         if (optionalCaja.isPresent()) {
             Caja caja = optionalCaja.get();
-            caja.setFechaCierre(new java.util.Date());
-            Iterable<DetalleCaja> detallesCaja = detalleCajaRepository.findAllByCajaIdAndCerradoIsFalse(caja.getId());
-            for (DetalleCaja detalle : detallesCaja) {
-                detalle.setCerrado(true);
+            if (caja.getEstado() == 'A') {
+                caja.setFechaCierre(new java.util.Date());
+                Iterable<DetalleCaja> detallesCaja = detalleCajaRepository.findAllByCajaIdAndCerradoIsFalse(caja.getId());
+                for (DetalleCaja detalle : detallesCaja) {
+                    detalle.setCerrado(true);
+                }
+                repository.save(caja);
+                detalleCajaRepository.saveAll(detallesCaja);
+                return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "caja cerrada correctamente", detallesCaja);
+            } else {
+                return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "esta caja ya esta cerrada");
             }
-            repository.save(caja);
-            detalleCajaRepository.saveAll(detallesCaja);
-            return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "caja cerrada correctamente", detallesCaja);
         } else {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se encontro la caja");
         }
@@ -105,7 +110,7 @@ public class CajaService {
                     MetodoPago metodoPago = optionalMetodoPago.get();
                     Optional<ConceptoMovCaja> optionalConceptoMovCaja = conceptoMovCajaRepository.findById(movCaja.getConceptoMovCaja().getId());
                     if (optionalConceptoMovCaja.isPresent()) {
-                        Optional<DetalleCaja> optionalDetalleCaja = detalleCajaRepository.findByCajaIdAndMetodoPagoId(caja.getId(), metodoPago.getId());
+                        Optional<DetalleCaja> optionalDetalleCaja = detalleCajaRepository.findByCajaIdAndMetodoPagoIdAndCerradoIsFalse(caja.getId(), metodoPago.getId());
                         if (optionalDetalleCaja.isPresent()) {
                             DetalleCaja detalleCaja = optionalDetalleCaja.get();
                             if (movCaja.getTipoMov() == 'E') {
@@ -198,17 +203,26 @@ public class CajaService {
                             .contentType(MediaType.APPLICATION_PDF)
                             .body(new ByteArrayResource(binaryReport));
                 } else {
-                    System.err.println("esta caja no tiene una apertura con la fecha especificada");
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    //System.err.println("esta caja no tiene una apertura con la fecha especificada");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("esta caja no tiene una apertura con la fecha especificada");
                 }
             } else {
-                System.err.println("caja no encontrada");
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                //System.err.println("caja no encontrada");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("caja no encontrada");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            //return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public GenericResponse<Iterable<Apertura>> getAperturas(int idCaja) {
+        if (repository.existsById(idCaja)) {
+            return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, aperturaRepository.findAllByCajaId(idCaja));
+        } else {
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
         }
     }
 }

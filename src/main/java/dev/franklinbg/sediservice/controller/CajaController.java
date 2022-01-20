@@ -1,5 +1,6 @@
 package dev.franklinbg.sediservice.controller;
 
+import dev.franklinbg.sediservice.entity.Apertura;
 import dev.franklinbg.sediservice.entity.Caja;
 import dev.franklinbg.sediservice.entity.DetalleCaja;
 import dev.franklinbg.sediservice.entity.MovCaja;
@@ -45,8 +46,13 @@ public class CajaController {
         return service.anularMovimiento(id);
     }
 
-    @GetMapping("/report")
+    @GetMapping("report")
     public ResponseEntity<?> report(@RequestParam int idCaja, @RequestParam String fechaApertura) {
         return service.descargarReporte(idCaja, fechaApertura);
+    }
+
+    @GetMapping("aperturas/{idCaja}")
+    public GenericResponse<Iterable<Apertura>> getAperturas(@PathVariable int idCaja) {
+        return service.getAperturas(idCaja);
     }
 }

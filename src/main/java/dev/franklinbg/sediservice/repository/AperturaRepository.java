@@ -11,4 +11,6 @@ public interface AperturaRepository extends CrudRepository<Apertura, Integer> {
     Apertura getLastRegister();
 
     boolean existsByCajaIdAndFechaApertura(int cajaId, Date fechaApertura);
+
+    Iterable<Apertura> findAllByCajaId(int idCaja);
 }
