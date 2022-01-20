@@ -43,7 +43,7 @@ public class CajaService {
 
     public GenericResponse<Caja> findByUsuarioId(int idU) {
         Optional<Caja> optCaja = repository.findByUsuarioId(idU);
-        return optCaja.map(caja -> new GenericResponse<>(TIPO_RESULT, RPTA_OK, OPERACION_CORRECTA, caja)).orElseGet(() -> new GenericResponse<>(TIPO_RESULT, RPTA_OK, "no se ha encontrado una caja asociada a este usuario"));
+        return optCaja.map(caja -> new GenericResponse<>(TIPO_RESULT, RPTA_OK, OPERACION_CORRECTA, caja)).orElseGet(() -> new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se ha encontrado una caja asociada a este usuario"));
     }
 
     public GenericResponse<CajaWithDetallesDTO> open(CajaWithDetallesDTO dto) {
