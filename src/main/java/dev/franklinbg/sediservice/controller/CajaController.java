@@ -55,4 +55,9 @@ public class CajaController {
     public GenericResponse<Iterable<Apertura>> getAperturas(@PathVariable int idCaja) {
         return service.getAperturas(idCaja);
     }
+
+    @GetMapping("detallesActuales/{idCaja}")
+    public GenericResponse<Iterable<DetalleCaja>> getCurrentDetails(@PathVariable int idCaja) {
+        return service.getCurrentDetails(idCaja);
+    }
 }

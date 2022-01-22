@@ -1,6 +1,7 @@
 package dev.franklinbg.sediservice.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import java.sql.Date;
 
 @Entity
@@ -23,6 +24,9 @@ public class Contrato {
     private double cuotaMensual;
     @Column(nullable = false, length = 11)
     private int totalCuotas;
+    @Max(message = "solo 3 cuotas como máximo", value = 3)
+    @Column(nullable = false)
+    private int cuotasPagadas;
     @Column(length = 1, nullable = false)
     private char estado;
 
@@ -88,6 +92,14 @@ public class Contrato {
 
     public void setTotalCuotas(int totalCuotas) {
         this.totalCuotas = totalCuotas;
+    }
+
+    public int getCuotasPagadas() {
+        return cuotasPagadas;
+    }
+
+    public void setCuotasPagadas(int cuotasPagadas) {
+        this.cuotasPagadas = cuotasPagadas;
     }
 
     public char getEstado() {

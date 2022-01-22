@@ -7,6 +7,7 @@ import dev.franklinbg.sediservice.utils.GenericResponse;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -97,42 +98,46 @@ public class CajaService {
             Optional<Caja> optionalCaja = repository.findById(movCaja.getCaja().getId());
             if (optionalCaja.isPresent()) {
                 Caja caja = optionalCaja.get();
-                if (movCaja.getTipoMov() == 'E') {
-                    caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
-                } else {
-                    if (movCaja.getTotal() > caja.getMontoCierre()) {
-                        return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en caja,disponible:" + caja.getMontoCierre());
+                if (caja.getEstado() == 'A') {
+                    if (movCaja.getTipoMov() == 'E') {
+                        caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
+                    } else {
+                        if (movCaja.getTotal() > caja.getMontoCierre()) {
+                            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en caja,disponible:" + caja.getMontoCierre());
+                        }
+                        caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
                     }
-                    caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
-                }
-                Optional<MetodoPago> optionalMetodoPago = metodoPagoRepsository.findById(movCaja.getMetodoPago().getId());
-                if (optionalMetodoPago.isPresent()) {
-                    MetodoPago metodoPago = optionalMetodoPago.get();
-                    Optional<ConceptoMovCaja> optionalConceptoMovCaja = conceptoMovCajaRepository.findById(movCaja.getConceptoMovCaja().getId());
-                    if (optionalConceptoMovCaja.isPresent()) {
-                        Optional<DetalleCaja> optionalDetalleCaja = detalleCajaRepository.findByCajaIdAndMetodoPagoIdAndCerradoIsFalse(caja.getId(), metodoPago.getId());
-                        if (optionalDetalleCaja.isPresent()) {
-                            DetalleCaja detalleCaja = optionalDetalleCaja.get();
-                            if (movCaja.getTipoMov() == 'E') {
-                                detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + movCaja.getTotal());
-                            } else {
-                                if (movCaja.getTotal() > detalleCaja.getMontoCierre()) {
-                                    return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en este metodo de pago,disponible:" + detalleCaja.getMontoCierre());
+                    Optional<MetodoPago> optionalMetodoPago = metodoPagoRepsository.findById(movCaja.getMetodoPago().getId());
+                    if (optionalMetodoPago.isPresent()) {
+                        MetodoPago metodoPago = optionalMetodoPago.get();
+                        Optional<ConceptoMovCaja> optionalConceptoMovCaja = conceptoMovCajaRepository.findById(movCaja.getConceptoMovCaja().getId());
+                        if (optionalConceptoMovCaja.isPresent()) {
+                            Optional<DetalleCaja> optionalDetalleCaja = detalleCajaRepository.findByCajaIdAndMetodoPagoIdAndCerradoIsFalse(caja.getId(), metodoPago.getId());
+                            if (optionalDetalleCaja.isPresent()) {
+                                DetalleCaja detalleCaja = optionalDetalleCaja.get();
+                                if (movCaja.getTipoMov() == 'E') {
+                                    detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + movCaja.getTotal());
+                                } else {
+                                    if (movCaja.getTotal() > detalleCaja.getMontoCierre()) {
+                                        return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en este metodo de pago,disponible:" + detalleCaja.getMontoCierre());
+                                    }
+                                    detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - movCaja.getTotal());
                                 }
-                                detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - movCaja.getTotal());
+                                repository.save(caja);
+                                detalleCajaRepository.save(detalleCaja);
+                                movCaja.setApertura(aperturaRepository.getLastRegister());
+                                return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "movimiento registrado correctamente", movCajaRepository.save(movCaja));
+                            } else {
+                                return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "detalle de caja no encontrado");
                             }
-                            repository.save(caja);
-                            detalleCajaRepository.save(detalleCaja);
-                            movCaja.setApertura(aperturaRepository.getLastRegister());
-                            return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "movimiento registrado correctamente", movCajaRepository.save(movCaja));
                         } else {
-                            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "detalle de caja no encontrado");
+                            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "concepto de movimiento no encontrado");
                         }
                     } else {
-                        return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "concepto de movimiento no encontrado");
+                        return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "metodo de pago no encontrado");
                     }
                 } else {
-                    return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "metodo de pago no encontrado");
+                    return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "esta caja esta cerrada");
                 }
             } else {
                 return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
@@ -221,6 +226,19 @@ public class CajaService {
     public GenericResponse<Iterable<Apertura>> getAperturas(int idCaja) {
         if (repository.existsById(idCaja)) {
             return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, aperturaRepository.findAllByCajaId(idCaja));
+        } else {
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
+        }
+    }
+
+    public GenericResponse<Iterable<DetalleCaja>> getCurrentDetails(int idCaja) {
+        if (repository.existsById(idCaja)) {
+            Iterable<DetalleCaja> detalles = detalleCajaRepository.findAllByCajaIdAndCerradoIsFalse(idCaja);
+            if (!IterableUtils.isEmpty(detalles)) {
+                return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, detalles);
+            } else {
+                return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no hay detalles actuales para esta caja,es posible que la caja esté cerrada");
+            }
         } else {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
         }
