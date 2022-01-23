@@ -76,6 +76,7 @@ public class CajaService {
         if (optionalCaja.isPresent()) {
             Caja caja = optionalCaja.get();
             if (caja.getEstado() == 'A') {
+                caja.setEstado('C');
                 caja.setFechaCierre(new java.util.Date());
                 Iterable<DetalleCaja> detallesCaja = detalleCajaRepository.findAllByCajaIdAndCerradoIsFalse(caja.getId());
                 for (DetalleCaja detalle : detallesCaja) {

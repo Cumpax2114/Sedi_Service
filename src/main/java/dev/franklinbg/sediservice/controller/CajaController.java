@@ -31,8 +31,8 @@ public class CajaController {
         return service.open(dto);
     }
 
-    @PostMapping("close")
-    public GenericResponse<Iterable<DetalleCaja>> close(@RequestParam int idCaja) {
+    @PutMapping("close/{idCaja}")
+    public GenericResponse<Iterable<DetalleCaja>> close(@PathVariable int idCaja) {
         return service.close(idCaja);
     }
 
