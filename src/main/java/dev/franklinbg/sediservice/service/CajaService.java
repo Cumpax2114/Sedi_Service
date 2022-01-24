@@ -111,9 +111,9 @@ public class CajaService {
                                 DetalleCaja detalleCaja = optionalDetalleCaja.get();
                                 if (movCaja.getTipoMov() == 'E') {
                                     detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + movCaja.getTotal());
-                                    caja.setMontoCierre(caja.getMontoCierre()+ movCaja.getTotal());
+                                    caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
                                 } else {
-                                    if (movCaja.getTotal() < detalleCaja.getMontoCierre()) {
+                                    if (movCaja.getTotal() <= detalleCaja.getMontoCierre()) {
                                         detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - movCaja.getTotal());
                                         caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
                                     } else {

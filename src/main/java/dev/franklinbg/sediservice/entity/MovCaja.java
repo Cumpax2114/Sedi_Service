@@ -144,20 +144,23 @@ public class MovCaja {
         this.estado = estado;
     }
 
-    public String getNombreCliente() {
+    public String getNombrePersona() {
         if (cliente != null) {
             return cliente.getNombre();
+        } else if (proveedor != null) {
+            return proveedor.getNombre();
+        } else if (trabajador != null) {
+            return trabajador.getNombre();
         } else {
-            return "";
+            return "no name";
         }
-
     }
 
     public String getNombreMetodoPago() {
         if (metodoPago != null) {
             return metodoPago.getNombre();
         } else {
-            return "";
+            return "null";
         }
     }
 }
