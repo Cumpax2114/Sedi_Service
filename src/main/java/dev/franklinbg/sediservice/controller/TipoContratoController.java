@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("contrato")
+@RequestMapping("tipoContrato")
 public class TipoContratoController {
     private final TipoContratoService service;
 
@@ -16,7 +16,7 @@ public class TipoContratoController {
         this.service = service;
     }
 
-    @GetMapping("tipo")
+    @GetMapping
     public GenericResponse<Iterable<TipoContrato>> getTiposContrato() {
         return service.listActivos();
     }

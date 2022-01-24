@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-01-2022 a las 00:59:26
+-- Tiempo de generación: 24-01-2022 a las 08:59:50
 -- Versión del servidor: 10.4.21-MariaDB
 -- Versión de PHP: 8.0.10
 
@@ -134,6 +134,14 @@ CREATE TABLE `contrato` (
   `tipo_contrato_id` int(11) NOT NULL,
   `cuotas_pagadas` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `contrato`
+--
+
+INSERT INTO `contrato` (`id`, `cuota_mensual`, `estado`, `fecha_inicio`, `fecha_termino`, `total_contrato`, `total_cuotas`, `cliente_id`, `tipo_contrato_id`, `cuotas_pagadas`) VALUES
+(1, '10.00', 'P', '2022-01-24', '2022-02-28', '100.00', 10, 1, 1, 0),
+(2, '4.00', 'P', '2022-01-25', '2022-01-30', '20.00', 5, 6, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -462,7 +470,7 @@ ALTER TABLE `concepto_mov_caja`
 -- AUTO_INCREMENT de la tabla `contrato`
 --
 ALTER TABLE `contrato`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_caja`

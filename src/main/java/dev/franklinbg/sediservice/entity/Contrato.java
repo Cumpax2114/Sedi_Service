@@ -1,7 +1,11 @@
 package dev.franklinbg.sediservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.sql.Date;
 
 @Entity
@@ -10,21 +14,30 @@ public class Contrato {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(length = 11)
     private int id;
+    @NotNull
     @ManyToOne(optional = false)
     private TipoContrato tipoContrato;
+    @NotNull
     @ManyToOne(optional = false)
     private Cliente cliente;
+    @JsonFormat(pattern = "dd/MM/yyyy", timezone = "America/Lima")
+    @NotNull(message = "la fecha de inicio no puede estar vacía")
     @Column(nullable = false)
     private Date fechaInicio;
+    @JsonFormat(pattern = "dd/MM/yyyy", timezone = "America/Lima")
+    @NotNull(message = "la fecha de término no puede estar vacía")
     @Column(nullable = false)
     private Date fechaTermino;
+    @Min(value = 1, message = "el total de contrato no puede ser 0")
     @Column(columnDefinition = "DECIMAL(11,2)", nullable = false)
     private double totalContrato;
+    @Min(value = 1, message = "debe de haber por lo menos una cuota")
     @Column(columnDefinition = "DECIMAL(11,2)", nullable = false)
     private double cuotaMensual;
     @Column(nullable = false, length = 11)
+    @Min(value = 1, message = "el total por cuotas no puede ser 0")
+    @Max(message = "solo 24 cuotas como máximo", value = 24)
     private int totalCuotas;
-    @Max(message = "solo 3 cuotas como máximo", value = 3)
     @Column(nullable = false)
     private int cuotasPagadas;
     @Column(length = 1, nullable = false)
