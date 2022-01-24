@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-01-2022 a las 08:59:50
+-- Tiempo de generación: 24-01-2022 a las 21:14:51
 -- Versión del servidor: 10.4.21-MariaDB
 -- Versión de PHP: 8.0.10
 
@@ -33,13 +33,6 @@ CREATE TABLE `apertura` (
   `caja_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `apertura`
---
-
-INSERT INTO `apertura` (`id`, `fecha_apertura`, `caja_id`) VALUES
-(4, '2022-01-23', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -61,7 +54,7 @@ CREATE TABLE `caja` (
 --
 
 INSERT INTO `caja` (`id`, `estado`, `fecha_apertura`, `fecha_cierre`, `monto_apertura`, `monto_cierre`, `usuario_id`) VALUES
-(1, 'A', '2022-01-23 11:27:50', '2022-01-23 17:43:34', '200.00', '350.00', 1);
+(1, 'C', '2022-01-23 11:27:50', '2022-01-23 17:43:34', '200.00', '200.00', 1);
 
 -- --------------------------------------------------------
 
@@ -92,7 +85,8 @@ INSERT INTO `cliente` (`id`, `correo`, `direccion`, `documento`, `estado`, `mont
 (5, NULL, 'CALLE VENUS 145 URB SANTA ELENA', '01139746', 'I', '0.00', 'VEINTIMILLA TUESTA, JESUS', '993660243', '14,1401,140101'),
 (6, NULL, 'exapledirbyJmontanaro', '835681026719243', 'A', '0.00', 'Jonas Montanaro de Farina', '+571672578192', '. . .'),
 (7, NULL, 'RAMA CUSTODIO MZ F LT 65 CPM CALLANCA', '71509556', 'A', '0.00', 'BUENO GONZALES, FRANKLIN', '985178542', '14,1401,140108'),
-(8, NULL, 'JR.LEGUIA 380', '01139745', 'A', '0.00', 'RAMIREZ PINEDO, LEONARDO LUIS', '996782153', '22,2209,220901');
+(8, NULL, 'JR.LEGUIA 380', '01139745', 'A', '0.00', 'RAMIREZ PINEDO, LEONARDO LUIS', '996782153', '22,2209,220901'),
+(9, NULL, 'Quedevo Vázquez', '2784159835', 'A', '0.00', 'Kevin Aaron', '+549821583447', '- - -');
 
 -- --------------------------------------------------------
 
@@ -111,10 +105,10 @@ CREATE TABLE `concepto_mov_caja` (
 --
 
 INSERT INTO `concepto_mov_caja` (`id`, `estado`, `nombre`) VALUES
-(17, 'A', 'Pago de planilla'),
-(18, 'A', 'Pago de pasajes'),
-(19, 'A', 'Gastos de administración'),
-(20, 'A', 'Servicio de facturación');
+(1, 'A', 'Pago de planilla'),
+(2, 'A', 'Pago de pasajes'),
+(3, 'A', 'Gastos de administración'),
+(4, 'A', 'Servicio de facturación');
 
 -- --------------------------------------------------------
 
@@ -135,14 +129,6 @@ CREATE TABLE `contrato` (
   `cuotas_pagadas` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Volcado de datos para la tabla `contrato`
---
-
-INSERT INTO `contrato` (`id`, `cuota_mensual`, `estado`, `fecha_inicio`, `fecha_termino`, `total_contrato`, `total_cuotas`, `cliente_id`, `tipo_contrato_id`, `cuotas_pagadas`) VALUES
-(1, '10.00', 'P', '2022-01-24', '2022-02-28', '100.00', 10, 1, 1, 0),
-(2, '4.00', 'P', '2022-01-25', '2022-01-30', '20.00', 5, 6, 1, 0);
-
 -- --------------------------------------------------------
 
 --
@@ -158,15 +144,6 @@ CREATE TABLE `detalle_caja` (
   `cerrado` bit(1) NOT NULL,
   `fecha_creacion` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `detalle_caja`
---
-
-INSERT INTO `detalle_caja` (`id`, `monto`, `caja_id`, `metodo_pago_id`, `monto_cierre`, `cerrado`, `fecha_creacion`) VALUES
-(1, '120.00', 1, 1, '20.00', b'0', '2022-01-23'),
-(2, '50.00', 1, 2, '300.00', b'0', '2022-01-23'),
-(3, '30.00', 1, 3, '30.00', b'0', '2022-01-23');
 
 -- --------------------------------------------------------
 
@@ -238,16 +215,6 @@ CREATE TABLE `mov_caja` (
   `trabajador_id` int(11) DEFAULT NULL,
   `apertura_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Volcado de datos para la tabla `mov_caja`
---
-
-INSERT INTO `mov_caja` (`id`, `descripcion`, `estado`, `tipo_mov`, `total`, `caja_id`, `concepto_mov_caja_id`, `metodo_pago_id`, `usuario_id`, `cliente_id`, `proveedor_id`, `trabajador_id`, `apertura_id`) VALUES
-(1, 'pago a Jennyfer', 'P', 'S', '75.00', 1, 17, 1, 1, 1, NULL, NULL, 4),
-(2, 'pago del pasaje a pomalca a Jonas', 'P', 'S', '20.00', 1, 18, 1, 1, 6, NULL, NULL, 4),
-(3, 'facturación de Jesús', 'P', 'S', '5.00', 1, 20, 1, 1, 5, NULL, NULL, 4),
-(4, 'transporte de los trabajadores de EPSON a chiclayo', 'P', 'E', '250.00', 1, 18, 2, 1, 3, NULL, NULL, 4);
 
 -- --------------------------------------------------------
 
@@ -332,7 +299,7 @@ CREATE TABLE `usuario` (
 
 INSERT INTO `usuario` (`id`, `contrasenia`, `correo`, `login`, `nombre`, `telefono`, `empresa_id`) VALUES
 (1, 'admin123', 'frabugo@gmail.com', 'ocumpaV', 'Franklin Bueno Gonzales', '937813800', 1),
-(11, 'jhon9669', 'jhonpablo96@hotmail.com', 'jhon96', 'Jhon Timaná Gonzales', '946519928', 2);
+(2, 'jhon9669', 'jhonpablo96@hotmail.com', 'jhon96', 'Jhon Timaná Gonzales', '946519928', 2);
 
 --
 -- Índices para tablas volcadas
@@ -446,7 +413,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `apertura`
 --
 ALTER TABLE `apertura`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `caja`
@@ -458,25 +425,25 @@ ALTER TABLE `caja`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `concepto_mov_caja`
 --
 ALTER TABLE `concepto_mov_caja`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `contrato`
 --
 ALTER TABLE `contrato`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_caja`
 --
 ALTER TABLE `detalle_caja`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `empresa`
@@ -494,7 +461,7 @@ ALTER TABLE `metodo_pago`
 -- AUTO_INCREMENT de la tabla `mov_caja`
 --
 ALTER TABLE `mov_caja`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `pago_contrato`
@@ -518,7 +485,7 @@ ALTER TABLE `tipo_contrato`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas
