@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-01-2022 a las 04:51:25
+-- Tiempo de generación: 24-01-2022 a las 00:59:26
 -- Versión del servidor: 10.4.21-MariaDB
 -- Versión de PHP: 8.0.10
 
@@ -38,8 +38,7 @@ CREATE TABLE `apertura` (
 --
 
 INSERT INTO `apertura` (`id`, `fecha_apertura`, `caja_id`) VALUES
-(1, '2022-01-13', 1),
-(2, '2022-01-19', 1);
+(4, '2022-01-23', 1);
 
 -- --------------------------------------------------------
 
@@ -62,7 +61,7 @@ CREATE TABLE `caja` (
 --
 
 INSERT INTO `caja` (`id`, `estado`, `fecha_apertura`, `fecha_cierre`, `monto_apertura`, `monto_cierre`, `usuario_id`) VALUES
-(1, 'A', '2022-01-19 22:21:31', '2022-01-19 12:57:03', '200.00', '70.00', 1);
+(1, 'A', '2022-01-23 11:27:50', '2022-01-23 17:43:34', '200.00', '350.00', 1);
 
 -- --------------------------------------------------------
 
@@ -92,7 +91,8 @@ INSERT INTO `cliente` (`id`, `correo`, `direccion`, `documento`, `estado`, `mont
 (4, NULL, 'CALLE VENUS 145 URB.SANTA ELENA', '16620936', 'A', '0.00', 'CUMPA SANCHEZ, OSCAR MANUEL', '956322572', '14,1401,140101'),
 (5, NULL, 'CALLE VENUS 145 URB SANTA ELENA', '01139746', 'I', '0.00', 'VEINTIMILLA TUESTA, JESUS', '993660243', '14,1401,140101'),
 (6, NULL, 'exapledirbyJmontanaro', '835681026719243', 'A', '0.00', 'Jonas Montanaro de Farina', '+571672578192', '. . .'),
-(7, NULL, 'RAMA CUSTODIO MZ F LT 65 CPM CALLANCA', '71509556', 'A', '0.00', 'BUENO GONZALES, FRANKLIN', '985178542', '14,1401,140108');
+(7, NULL, 'RAMA CUSTODIO MZ F LT 65 CPM CALLANCA', '71509556', 'A', '0.00', 'BUENO GONZALES, FRANKLIN', '985178542', '14,1401,140108'),
+(8, NULL, 'JR.LEGUIA 380', '01139745', 'A', '0.00', 'RAMIREZ PINEDO, LEONARDO LUIS', '996782153', '22,2209,220901');
 
 -- --------------------------------------------------------
 
@@ -131,7 +131,8 @@ CREATE TABLE `contrato` (
   `total_contrato` decimal(11,2) NOT NULL,
   `total_cuotas` int(11) NOT NULL,
   `cliente_id` int(11) NOT NULL,
-  `tipo_contrato_id` int(11) NOT NULL
+  `tipo_contrato_id` int(11) NOT NULL,
+  `cuotas_pagadas` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -146,7 +147,7 @@ CREATE TABLE `detalle_caja` (
   `caja_id` int(11) NOT NULL,
   `metodo_pago_id` int(11) NOT NULL,
   `monto_cierre` decimal(11,2) NOT NULL,
-  `cerrado` bit(1) DEFAULT NULL,
+  `cerrado` bit(1) NOT NULL,
   `fecha_creacion` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -155,12 +156,9 @@ CREATE TABLE `detalle_caja` (
 --
 
 INSERT INTO `detalle_caja` (`id`, `monto`, `caja_id`, `metodo_pago_id`, `monto_cierre`, `cerrado`, `fecha_creacion`) VALUES
-(1, '10.00', 1, 1, '50.00', b'1', '2022-01-13'),
-(2, '50.00', 1, 2, '100.00', b'1', '2022-01-13'),
-(3, '100.00', 1, 3, '100.00', b'1', '2022-01-13'),
-(4, '100.00', 1, 1, '50.00', b'0', '2022-01-19'),
-(5, '60.00', 1, 2, '60.00', b'0', '2022-01-19'),
-(6, '40.00', 1, 3, '40.00', b'0', '2022-01-19');
+(1, '120.00', 1, 1, '20.00', b'0', '2022-01-23'),
+(2, '50.00', 1, 2, '300.00', b'0', '2022-01-23'),
+(3, '30.00', 1, 3, '30.00', b'0', '2022-01-23');
 
 -- --------------------------------------------------------
 
@@ -238,9 +236,10 @@ CREATE TABLE `mov_caja` (
 --
 
 INSERT INTO `mov_caja` (`id`, `descripcion`, `estado`, `tipo_mov`, `total`, `caja_id`, `concepto_mov_caja_id`, `metodo_pago_id`, `usuario_id`, `cliente_id`, `proveedor_id`, `trabajador_id`, `apertura_id`) VALUES
-(1, 'primer movimiento de caja registrado desde el aplicativo móvil', 'P', 'E', '40.00', 1, 17, 1, 1, 1, NULL, NULL, 1),
-(2, 'segundo movimiento de caja registrado desde el aplicativo móvil', 'P', 'E', '50.00', 1, 19, 2, 1, 1, NULL, NULL, 1),
-(3, 'pago a trabajador', 'P', 'S', '50.00', 1, 18, 1, 1, 1, NULL, NULL, 2);
+(1, 'pago a Jennyfer', 'P', 'S', '75.00', 1, 17, 1, 1, 1, NULL, NULL, 4),
+(2, 'pago del pasaje a pomalca a Jonas', 'P', 'S', '20.00', 1, 18, 1, 1, 6, NULL, NULL, 4),
+(3, 'facturación de Jesús', 'P', 'S', '5.00', 1, 20, 1, 1, 5, NULL, NULL, 4),
+(4, 'transporte de los trabajadores de EPSON a chiclayo', 'P', 'E', '250.00', 1, 18, 2, 1, 3, NULL, NULL, 4);
 
 -- --------------------------------------------------------
 
@@ -295,6 +294,13 @@ CREATE TABLE `tipo_contrato` (
   `estado` char(1) NOT NULL,
   `nombre` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `tipo_contrato`
+--
+
+INSERT INTO `tipo_contrato` (`id`, `estado`, `nombre`) VALUES
+(1, 'A', 'Facturación electrónica');
 
 -- --------------------------------------------------------
 
@@ -432,7 +438,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `apertura`
 --
 ALTER TABLE `apertura`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `caja`
@@ -444,7 +450,7 @@ ALTER TABLE `caja`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `concepto_mov_caja`
@@ -462,7 +468,7 @@ ALTER TABLE `contrato`
 -- AUTO_INCREMENT de la tabla `detalle_caja`
 --
 ALTER TABLE `detalle_caja`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `empresa`
@@ -480,7 +486,7 @@ ALTER TABLE `metodo_pago`
 -- AUTO_INCREMENT de la tabla `mov_caja`
 --
 ALTER TABLE `mov_caja`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `pago_contrato`
@@ -498,7 +504,7 @@ ALTER TABLE `proveedor`
 -- AUTO_INCREMENT de la tabla `tipo_contrato`
 --
 ALTER TABLE `tipo_contrato`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`

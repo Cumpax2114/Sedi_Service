@@ -100,14 +100,7 @@ public class CajaService {
             if (optionalCaja.isPresent()) {
                 Caja caja = optionalCaja.get();
                 if (caja.getEstado() == 'A') {
-                    if (movCaja.getTipoMov() == 'E') {
-                        caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
-                    } else {
-                        if (movCaja.getTotal() > caja.getMontoCierre()) {
-                            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en caja,disponible:" + caja.getMontoCierre());
-                        }
-                        caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
-                    }
+                    movCaja.setCaja(caja);
                     Optional<MetodoPago> optionalMetodoPago = metodoPagoRepsository.findById(movCaja.getMetodoPago().getId());
                     if (optionalMetodoPago.isPresent()) {
                         MetodoPago metodoPago = optionalMetodoPago.get();
@@ -118,11 +111,14 @@ public class CajaService {
                                 DetalleCaja detalleCaja = optionalDetalleCaja.get();
                                 if (movCaja.getTipoMov() == 'E') {
                                     detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + movCaja.getTotal());
+                                    caja.setMontoCierre(caja.getMontoCierre()+ movCaja.getTotal());
                                 } else {
-                                    if (movCaja.getTotal() > detalleCaja.getMontoCierre()) {
+                                    if (movCaja.getTotal() < detalleCaja.getMontoCierre()) {
+                                        detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - movCaja.getTotal());
+                                        caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
+                                    } else {
                                         return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "salida rechazada,el monto excede el monto actualmente disponible en este metodo de pago,disponible:" + detalleCaja.getMontoCierre());
                                     }
-                                    detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - movCaja.getTotal());
                                 }
                                 repository.save(caja);
                                 detalleCajaRepository.save(detalleCaja);
