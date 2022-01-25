@@ -240,4 +240,12 @@ public class CajaService {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
         }
     }
+
+    public GenericResponse<Iterable<MovCaja>> getMovimientosById(int idCaja) {
+        if (repository.existsById(idCaja)) {
+            return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, movCajaRepository.findAllByCajaId(idCaja));
+        } else {
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
+        }
+    }
 }

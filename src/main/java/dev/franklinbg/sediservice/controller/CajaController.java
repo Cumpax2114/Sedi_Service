@@ -60,4 +60,9 @@ public class CajaController {
     public GenericResponse<Iterable<DetalleCaja>> getCurrentDetails(@PathVariable int idCaja) {
         return service.getCurrentDetails(idCaja);
     }
+
+    @GetMapping("movimientos/{idCaja}")
+    public GenericResponse<Iterable<MovCaja>> getMovimientosById(@PathVariable int idCaja) {
+        return service.getMovimientosById(idCaja);
+    }
 }
