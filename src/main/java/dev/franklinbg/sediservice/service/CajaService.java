@@ -153,18 +153,22 @@ public class CajaService {
             }
             movCaja.setEstado('A');
             Caja caja = movCaja.getCaja();
-            Optional<DetalleCaja> optionalDetalleCaja = detalleCajaRepository.findByCajaIdAndMetodoPagoIdAndCerradoIsFalse(movCaja.getCaja().getId(), movCaja.getMetodoPago().getId());
+            Optional<DetalleCaja> optionalDetalleCaja = detalleCajaRepository.findByCajaIdAndMetodoPagoIdAndFechaCreacion(movCaja.getCaja().getId(), movCaja.getMetodoPago().getId(), movCaja.getApertura().getFechaApertura());
             if (optionalDetalleCaja.isPresent()) {
                 DetalleCaja detalleCaja = optionalDetalleCaja.get();
-                if (movCaja.getTipoMov() == 'E') {
-                    detalleCaja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
-                    caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
+                if (!detalleCaja.isCerrado()) {
+                    if (movCaja.getTipoMov() == 'E') {
+                        detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - movCaja.getTotal());
+                        caja.setMontoCierre(caja.getMontoCierre() - movCaja.getTotal());
+                    } else {
+                        detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + movCaja.getTotal());
+                        caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
+                    }
+                    repository.save(caja);
+                    return new GenericResponse<>(TIPO_RESULT, RPTA_OK, "movimiento anulado correctamente", movCajaRepository.save(movCaja));
                 } else {
-                    caja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
-                    detalleCaja.setMontoCierre(caja.getMontoCierre() + movCaja.getTotal());
+                    return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "el movimiento que deseas anular pertenece a un detalle de caja ya cerrado,operación improcedente");
                 }
-                repository.save(caja);
-                return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "movimiento anulado correctamente", movCajaRepository.save(movCaja));
             } else {
                 return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no se encontró el detalle de caja a actualizar");
             }

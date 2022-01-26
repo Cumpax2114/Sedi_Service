@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface DetalleCajaRepository extends CrudRepository<DetalleCaja, Integer> {
     Optional<DetalleCaja> findByCajaIdAndMetodoPagoIdAndCerradoIsFalse(int cajaId, int metodoPagoId);
 
+    Optional<DetalleCaja> findByCajaIdAndMetodoPagoIdAndFechaCreacion(int cajaId, int metodoPagoId, Date fechaCreacion);
+
     Iterable<DetalleCaja> findAllByCajaIdAndFechaCreacion(int cajaId, Date fechaCreacion);
 
     Iterable<DetalleCaja> findAllByCajaIdAndCerradoIsFalse(int cajaId);
