@@ -16,6 +16,10 @@ public class ContratoController {
         this.service = service;
     }
 
+    @GetMapping
+public GenericResponse<Iterable<Contrato>>listAll(){
+        return service.listAll();
+    }
     @PostMapping
     public GenericResponse<Contrato> save(@Valid @RequestBody Contrato contrato) {
         return service.save(contrato);

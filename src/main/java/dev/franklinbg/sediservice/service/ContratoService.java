@@ -40,4 +40,8 @@ public class ContratoService {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "tipo de contrato no encontrado");
         }
     }
+
+    public GenericResponse<Iterable<Contrato>> listAll() {
+        return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, repository.findAll());
+    }
 }
