@@ -135,7 +135,6 @@ public class ContratoService {
                 DetalleCaja detalleCaja = optionalDetalleCaja.get();
                 Caja caja = detalleCaja.getCaja();
                 double total = pago.getMontoPagado() * pagos.size();
-                if(total<=detalleCaja.getMontoCierre()){
                     detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + total);
                     caja.setMontoCierre(caja.getMontoCierre() + total);
                     detalleCajaRepository.save(detalleCaja);
@@ -144,9 +143,7 @@ public class ContratoService {
                     contrato.setCuotasPagadas(newCuotasPagadas);
                     repository.save(contrato);
                     return new GenericResponse<>(TIPO_RESULT,RPTA_OK,OPERACION_CORRECTA,pagoContratoRepository.saveAll(pagos));
-                }else{
-                    return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "no hay suficiente dinero para procesar la operación:disponible");
-                }
+
             } else {
                 return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "detalle de caja no encontrado,es probable que la caja esté cerrada");
             }
