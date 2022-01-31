@@ -66,7 +66,7 @@ public class ContratoService {
                 initialIdContrato = pago.getContrato().getId();
                 initalIdCaja = pago.getCaja().getId();
                 initialIdMetodoPago = pago.getMetodoPago().getId();
-                initialMontoPagado = 0.00;
+                initialMontoPagado = pago.getMontoPagado();
             } else {
                 if (pago.getContrato().getId() != initialIdContrato) {
                     return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "para usar este metodo todos los id's de contrato de la lista deben ser iguales");
@@ -109,8 +109,8 @@ public class ContratoService {
         int newCuotasPagadas = 0;
         if (cuotasPagadas == 0) {
             if (pagos.size() <= pago.getContrato().getTotalCuotas()) {
-                for (int i = 1; i <= pagos.size(); i++) {
-                    pagos.get(i).setNumeroCuota(i);
+                for (int i = 0; i < pagos.size(); i++) {
+                    pagos.get(i).setNumeroCuota(i+1);
                     newCuotasPagadas++;
                 }
             } else {
@@ -120,8 +120,8 @@ public class ContratoService {
             int cuotasPorPagar = pago.getContrato().getTotalCuotas() - pago.getContrato().getCuotasPagadas();
             newCuotasPagadas = pago.getContrato().getCuotasPagadas();
             if (pagos.size() <= cuotasPorPagar) {
-                for (int i = 1; i <= pagos.size(); i++) {
-                    pagos.get(i).setNumeroCuota(cuotasPagadas + 1);
+                for (PagoContrato pagoContrato : pagos) {
+                    pagoContrato.setNumeroCuota(cuotasPagadas + 1);
                     newCuotasPagadas++;
                     cuotasPagadas++;
                 }
@@ -136,8 +136,8 @@ public class ContratoService {
                 Caja caja = detalleCaja.getCaja();
                 double total = pago.getMontoPagado() * pagos.size();
                 if(total<=detalleCaja.getMontoCierre()){
-                    detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() - total);
-                    caja.setMontoCierre(caja.getMontoCierre() - total);
+                    detalleCaja.setMontoCierre(detalleCaja.getMontoCierre() + total);
+                    caja.setMontoCierre(caja.getMontoCierre() + total);
                     detalleCajaRepository.save(detalleCaja);
                     cajaRepository.save(caja);
                     Contrato contrato = pago.getContrato();

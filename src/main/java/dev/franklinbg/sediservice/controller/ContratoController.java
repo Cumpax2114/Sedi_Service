@@ -4,12 +4,9 @@ import dev.franklinbg.sediservice.entity.Contrato;
 import dev.franklinbg.sediservice.entity.PagoContrato;
 import dev.franklinbg.sediservice.service.ContratoService;
 import dev.franklinbg.sediservice.utils.GenericResponse;
-import dev.franklinbg.sediservice.utils.Global;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 
 import static dev.franklinbg.sediservice.utils.Global.RPTA_WARNING;
