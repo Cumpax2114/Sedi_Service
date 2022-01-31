@@ -10,11 +10,12 @@
     </parent>
     <groupId>dev.franklinbg</groupId>
     <artifactId>SediService</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1</version>
+    <packaging>jar</packaging>
     <name>SediService</name>
     <description>SediService</description>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -64,9 +65,22 @@
             <artifactId>itext</artifactId>
             <version>2.1.7</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.2-jre</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>appengine-maven-plugin</artifactId>
+                <version>1.3.2</version>
+                <configuration>
+                    <version>1</version>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

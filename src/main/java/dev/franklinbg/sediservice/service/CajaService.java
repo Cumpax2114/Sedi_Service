@@ -22,21 +22,22 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Transactional
 public class CajaService {
     private final CajaRepository repository;
     private final DetalleCajaRepository detalleCajaRepository;
-    private final MetodoPagoRepsository metodoPagoRepsository;
+    private final MetodoPagoRepository metodoPagoRepository;
     private final MovCajaRepository movCajaRepository;
     private final ConceptoMovCajaRepository conceptoMovCajaRepository;
     private final AperturaRepository aperturaRepository;
 
-    public CajaService(CajaRepository repository, DetalleCajaRepository detalleCajaRepository, MetodoPagoRepsository metodoPagoRepsository, MovCajaRepository movCajaRepository, ConceptoMovCajaRepository conceptoMovCajaRepository, AperturaRepository aperturaRepository) {
+    public CajaService(CajaRepository repository, DetalleCajaRepository detalleCajaRepository, MetodoPagoRepository metodoPagoRepository, MovCajaRepository movCajaRepository, ConceptoMovCajaRepository conceptoMovCajaRepository, AperturaRepository aperturaRepository) {
         this.repository = repository;
         this.detalleCajaRepository = detalleCajaRepository;
-        this.metodoPagoRepsository = metodoPagoRepsository;
+        this.metodoPagoRepository = metodoPagoRepository;
         this.movCajaRepository = movCajaRepository;
         this.conceptoMovCajaRepository = conceptoMovCajaRepository;
         this.aperturaRepository = aperturaRepository;
@@ -101,7 +102,7 @@ public class CajaService {
                 Caja caja = optionalCaja.get();
                 if (caja.getEstado() == 'A') {
                     movCaja.setCaja(caja);
-                    Optional<MetodoPago> optionalMetodoPago = metodoPagoRepsository.findById(movCaja.getMetodoPago().getId());
+                    Optional<MetodoPago> optionalMetodoPago = metodoPagoRepository.findById(movCaja.getMetodoPago().getId());
                     if (optionalMetodoPago.isPresent()) {
                         MetodoPago metodoPago = optionalMetodoPago.get();
                         Optional<ConceptoMovCaja> optionalConceptoMovCaja = conceptoMovCajaRepository.findById(movCaja.getConceptoMovCaja().getId());
@@ -186,17 +187,27 @@ public class CajaService {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 Date dateFechaApertura = new Date(simpleDateFormat.parse(fechaApertura).getTime());
                 if (aperturaRepository.existsByCajaIdAndFechaApertura(caja.getId(), dateFechaApertura)) {
+                    AtomicReference<Double> ingreso = new AtomicReference<>(0.0);
+                    AtomicReference<Double> egreso = new AtomicReference<>(0.0);
                     Iterable<DetalleCaja> detalles = detalleCajaRepository.findAllByCajaIdAndFechaCreacion(idCaja, dateFechaApertura);
+                    Iterable<MovCaja> movimientos = movCajaRepository.findAllByCajaIdAndAperturaFechaApertura(caja.getId(), dateFechaApertura);
+                    movimientos.forEach(mov -> {
+                        if (mov.getTipoMov() == 'E') {
+                            ingreso.updateAndGet(v -> v + mov.getTotal());
+                        } else {
+                            egreso.updateAndGet(v -> v + mov.getTotal());
+                        }
+                    });
                     JasperReport compiledReport = (JasperReport) JRLoader.loadObject(xmlReport);
                     HashMap<String, Object> parameters = new HashMap<>();
                     parameters.put("vendedor", caja.getUsuario().getNombre());
                     parameters.put("estadoCaja", caja.getEstado() == 'A' ? "Abierta" : "Cerrada");
                     parameters.put("saldoInicial", caja.getMontoApertura());
                     parameters.put("saldoFinal", caja.getMontoCierre());
-                    parameters.put("ingreso", 0.00);
-                    parameters.put("egreso", 0.00);
+                    parameters.put("ingreso", ingreso.get());
+                    parameters.put("egreso", egreso.get());
                     parameters.put("detallesDS", new JRBeanCollectionDataSource((Collection<?>) detalles));
-                    parameters.put("movimientosDS", new JRBeanCollectionDataSource((Collection<?>) movCajaRepository.findAllByCajaIdAndAperturaFechaApertura(caja.getId(), dateFechaApertura)));
+                    parameters.put("movimientosDS", new JRBeanCollectionDataSource((Collection<?>) movimientos));
                     JasperPrint jasperPrint = JasperFillManager.fillReport(compiledReport, parameters, new JREmptyDataSource());
                     byte[] binaryReport = JasperExportManager.exportReportToPdf(jasperPrint);
                     ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
@@ -248,6 +259,19 @@ public class CajaService {
     public GenericResponse<Iterable<MovCaja>> getMovimientosById(int idCaja) {
         if (repository.existsById(idCaja)) {
             return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, movCajaRepository.findAllByCajaId(idCaja));
+        } else {
+            return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
+        }
+    }
+
+    public GenericResponse<Iterable<MovCaja>> getMovimientosByAperturaId(int idApertura) {
+        Optional<Apertura> optApertura = aperturaRepository.findById(idApertura);
+        return optApertura.map(apertura -> new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, movCajaRepository.findAllByApertura(apertura))).orElseGet(() -> new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "apertura no encontrada"));
+    }
+
+    public GenericResponse<Iterable<DetalleCaja>> getUltimosDetalles(int idCaja) {
+        if (repository.existsById(idCaja)) {
+            return new GenericResponse<>(TIPO_DATA, RPTA_OK, OPERACION_CORRECTA, detalleCajaRepository.listUltimosDetalles(idCaja));
         } else {
             return new GenericResponse<>(TIPO_RESULT, RPTA_WARNING, "caja no encontrada");
         }

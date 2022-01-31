@@ -1,6 +1,7 @@
 package dev.franklinbg.sediservice.repository;
 
 import dev.franklinbg.sediservice.entity.DetalleCaja;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.sql.Date;
@@ -14,4 +15,7 @@ public interface DetalleCajaRepository extends CrudRepository<DetalleCaja, Integ
     Iterable<DetalleCaja> findAllByCajaIdAndFechaCreacion(int cajaId, Date fechaCreacion);
 
     Iterable<DetalleCaja> findAllByCajaIdAndCerradoIsFalse(int cajaId);
+
+    @Query(value = "SELECT * FROM detalle_caja WHERE caja_id=:idCaja AND cerrado IS TRUE ORDER BY id DESC LIMIT 3", nativeQuery = true)
+    Iterable<DetalleCaja> listUltimosDetalles(int idCaja);
 }
